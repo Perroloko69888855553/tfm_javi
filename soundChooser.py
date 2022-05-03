@@ -6,7 +6,7 @@
 # if you want playsound to run more efficiently.#
 #Guardar aqui los sonidos, pasarlos a SoundControl
 
-import serial 
+import serial, random
 from pydub import AudioSegment
 from pydub.playback import play
 # Puerto del arduino
@@ -25,8 +25,12 @@ except:
 for a in range(20):
    # print(str(arduino.readline()))
    #cm = "test"
-   id = str(arduino.readline())
-   cm = str(arduino.readline())
+   identificador = 0
+   entrada = arduino.read(1)
+   if entrada&8 == 0:
+       identificador = entrada
+       identificador = identificador >> 3
+    
    print("ID -  ", id, " CM - ", cm)
    if id not in ids:
        ids.append(id)

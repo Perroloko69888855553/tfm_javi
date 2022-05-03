@@ -1,7 +1,7 @@
 {
 	"sound_control":[{
 		"pulso":0.6,
-        "max_sounds": 5
+        "max_sounds": 3
 	}
 		
 	],

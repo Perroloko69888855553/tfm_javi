@@ -60,9 +60,12 @@ def main():
         distancia = random.randrange(0,400)
         sound = sondChooser(rn, distancia, sensor_distance)
         if sound > 0:
-            cancion = sounds_list["dir"]  + sounds_list[sound] + extension
-            print("cancion - ", cancion)
-            # cola.append(cancion)
+            
+            cancion = sounds_list["dir"]  + sounds_list[str(sound)] + extension
+            print(" ----------- .......... ###<")
+            for t in threading.enumerate():
+                print("HILO - ", t.getName())
+            cola.append(cancion)
         
 
 
