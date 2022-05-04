@@ -1,28 +1,20 @@
-#serial == pip install pyserial#
-# playsound == pip install playsound
+selector = 4
+cm = 300
+print("id base  ", selector)
+print("distancia base ", cm)
+bidentificador = selector << 3
+bdistancia = cm | 0x80
+cm = cm >> 7
+bidentificador = bidentificador | (0x07 & cm)
+print("B identificador",bin(bidentificador), " - NUMERO ",str(int(bidentificador)))
+print("B distancia", bin(bdistancia), " - NUMERO ", str(int(bdistancia)))
 
-# playsound is relying on another python subprocess. 
-# Please use `pip install pygobject` 
-# if you want playsound to run more efficiently.#
-#Guardar aqui los sonidos, pasarlos a SoundControl
+lista_bytes = []
+lista_bytes.append(bidentificador)
+lista_bytes.append(bdistancia)
 
-import serial, random
-from pydub import AudioSegment
-from pydub.playback import play
-# Puerto del arduino
-arduino_port = "/dev/ttyUSB0"
-baudroute = "9600"
-ids = []
-#Recoge el arduino 
-try:
-    arduino = serial.Serial(arduino_port, baudroute)
-except:
-    print("Ay dios mio y el  puerto??¿?¿?¿?¿")
-
-arduino.read_all()
-
-def getSensorYDistancia():
-    identificador = 0
+#reversa
+identificador = 0
 distancia = 0
 sensor = 0
 sensores = {}
@@ -41,5 +33,8 @@ for tmp in lista_bytes:
         aver = sensores[str(identificador)] + (tmp & 0x7F)
         print("A VER - distancia ",aver)
         print(" Distancia ? ",sensores[str(identificador)])
-        
 
+    
+
+print("ID ",identificador)
+print("DISTANCIA ",distancia)
