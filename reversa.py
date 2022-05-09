@@ -8,7 +8,7 @@ cm = cm >> 7
 bidentificador = bidentificador | (0x07 & cm)
 print("B identificador",bin(bidentificador), " - NUMERO ",str(int(bidentificador)))
 print("B distancia", bin(bdistancia), " - NUMERO ", str(int(bdistancia)))
-
+print(type(bidentificador))
 lista_bytes = []
 lista_bytes.append(bidentificador)
 lista_bytes.append(bdistancia)
@@ -19,7 +19,7 @@ distancia = 0
 sensor = 0
 sensores = {}
 for tmp in lista_bytes:
-    
+    print("loop", type(tmp))
     if tmp & 0x80 == 0:
         print("BIT DE PESO 0 ")
         identificador = tmp

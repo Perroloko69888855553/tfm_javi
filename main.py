@@ -1,17 +1,15 @@
 #Python 3.9.5
 #TFM_Javi
 #
-import json, os
+import json, os, serial, serial.tools.list_ports, warnings, random, multiprocessing, threading
 
-import multiprocessing
 from multiprocessing import Process, Queue
 
 from time import time, sleep
 from threading import Thread
-import threading
 from pydub import AudioSegment
 from pydub.playback import play
-import random 
+
 
 
 
@@ -44,31 +42,19 @@ def loopCola(cola, max_sounds,tiempoPulso, extension, song_db):
                 playtmp.start()
             cola.pop(0)
         sleep(tiempoPulso) 
- 
- #Interpreta los bytes enviados desde el arduino al programa
-def escaneoSensores(lista_bytes):
-    identificador = 0
-    distancia = 0
-    sensor = 0
-    lista_bytes = []
-    sensores = {}
-    for tmp in lista_bytes:
-    
-        if tmp & 0x80 == 0:
-            print("BIT DE PESO 0 ")
-            identificador = tmp
-            identificador = identificador >> 3
-            sensores[str(identificador)] = (tmp & 0x0003) << 7
-            print("Distancia PRE ? ", sensores[str(identificador)])
-            print("Identificador post ", identificador)
-        else:
-            print("identificador post ? ",identificador)
-            #sensores[str(identificador)] = bin( sensores[str(identificador)] + (tmp & 0x7F))
-            aver = sensores[str(identificador)] + (tmp & 0x7F)
-            print("A VER - distancia ",aver)
-            print(" Distancia ? ",sensores[str(identificador)])
-        #Enviar a soundChooser? 
 
+def deteccionPuertos():
+    arduino_ports = [
+    p.device
+    for p in serial.tools.list_ports.comports()
+    if 'tty' in p.name  # may need tweaking to match new arduinos
+    ]
+    if not arduino_ports:
+        raise IOError("No Arduino found")
+    if len(arduino_ports) > 1:
+        warnings.warn('Multiple Arduinos found - using the first')
+
+    return serial.Serial(arduino_ports[0])
 
 def main():
     print("Incio tfm_javier")
@@ -80,18 +66,23 @@ def main():
     device_conf = json_file["device_conf"][0]
     sensor_distance = json_file["sensor_distance"][0]
     song_db = json_file["song_db"][0]
+    arduino = deteccionPuertos()
+    sensores ={} 
+    print(serial)
+   # arduino = serial.Serial(device_conf["port"] , device_conf["baudroute"] )
    #vars 
     tiempoPulso = sound_control_conf["pulso"]
     max_sounds = sound_control_conf["max_sounds"]
     extension = sounds_list["ext"]
     fin = False
     cola =[] 
-    sensor = 0
+    identificador = 0
     distancia = 0
 
     #Hilo ejecución Canciones y Lectura
     tCanciones = Thread(target = loopCola, args = (cola,max_sounds,tiempoPulso,extension, song_db))
-    tEscaneo = Thread(target = escaneoSensores, args=())
+   # tEscaneo = Thread(target = escaneoSensores, args=())
+
    # tFinPrograma = Thread(target = finPrograma, args = (fin,))
 
     #iniciar hilos
@@ -100,17 +91,27 @@ def main():
     #tFinPrograma.start()
     while fin == False:
         #test --> rn = ID random, distancia 
-        rn = random.randrange(1,9)
-        dr = random.randrange(0,400)
-        sensor = rn
-        distancia = dr
+       # rn = random.randrange(1,9)
+       # dr = random.randrange(0,400)
+       # sensor = rn
+       # distancia = dr
         #test ----- fin
-        sleep(1)
-        sound = sondChooser(sensor, distancia, sensor_distance[str(sensor)])
-        if sound > 0:         
-            cancion = sounds_list["dir"]  + sounds_list[str(sound)] + extension
-            elementCola = (cancion,str(sound))
-            cola.append(elementCola)
+       # sleep(1)
+        tmp = int.from_bytes(arduino.read(), "big")
+        if tmp & 0x80 == 0:
+            identificador = tmp
+            identificador = identificador >> 3
+            sensores[str(identificador)] = (tmp & 0x0003) << 7
+            print("Identificador", identificador)
+        else:
+            print("identificador ",identificador)
+            distancia = sensores[str(identificador)] + (tmp & 0x7F)
+            print("distancia ",distancia)
+            sound = sondChooser(identificador, distancia, sensor_distance[str(identificador)])
+            if sound > 0:         
+                cancion = sounds_list["dir"]  + sounds_list[str(sound)] + extension
+                elementCola = (cancion,str(sound))
+                cola.append(elementCola)
 
 
 

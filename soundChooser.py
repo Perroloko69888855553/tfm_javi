@@ -19,15 +19,17 @@ try:
 except:
     print("Ay dios mio y el  puerto??¿?¿?¿?¿")
 
-arduino.read_all()
-
-def getSensorYDistancia():
-    identificador = 0
-distancia = 0
 sensor = 0
 sensores = {}
-for tmp in lista_bytes:
-    
+identificador = 0
+listabytees =[]
+#listabytees.append(arduino.read()) 
+
+while True:
+   #Cambiar a Big o Littlee 
+    tmp = int.from_bytes(arduino.read(), "big")
+   # listabytees.append(arduino.read()) 
+    print(type(tmp))
     if tmp & 0x80 == 0:
         print("BIT DE PESO 0 ")
         identificador = tmp
@@ -40,6 +42,6 @@ for tmp in lista_bytes:
         #sensores[str(identificador)] = bin( sensores[str(identificador)] + (tmp & 0x7F))
         aver = sensores[str(identificador)] + (tmp & 0x7F)
         print("A VER - distancia ",aver)
-        print(" Distancia ? ",sensores[str(identificador)])
+      #  print(" Distancia ? ",sensores[str(identificador)])
         
 

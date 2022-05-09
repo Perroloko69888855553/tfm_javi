@@ -27,7 +27,8 @@
 
     }],
     "device_conf":[{
-        "port":"/dev/ttyACM0"
+        "port":"/dev/ttyACM0",
+        "baudroute":"9600"
     }],
     "sensor_distance":[{
         "1":[
